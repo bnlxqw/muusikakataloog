@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Cataloog {
@@ -19,7 +18,6 @@ public class Cataloog {
             System.out.println("Catalog is empty");
             return;
         }
-
         System.out.println("All songs:");
         for (int i = 0; i < songs.size(); i++) {
             System.out.println((i + 1) + ". " + songs.get(i));
@@ -28,10 +26,11 @@ public class Cataloog {
 
     public List<Song> search(String keyword) {
         List<Song> result = new ArrayList<>();
-
+        String lowerKeyword = keyword.toLowerCase();
         for (Song s : songs) {
-            if (s.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
-                    s.getArtist().toLowerCase().contains(keyword.toLowerCase())) {
+            if (s.getTitle().toLowerCase().contains(lowerKeyword) ||
+                    s.getArtist().toLowerCase().contains(lowerKeyword) ||
+                    s.getGenre().getName().toLowerCase().contains(lowerKeyword)) {
                 result.add(s);
             }
         }
@@ -39,8 +38,11 @@ public class Cataloog {
     }
 
     public void deleteSong(String title) {
-        songs.removeIf(song ->
+        boolean removed = songs.removeIf(song ->
                 song.getTitle().equalsIgnoreCase(title));
+        if (!removed) {
+            System.out.println("Song '" + title + "' not found.");
+        }
     }
 
     public void rateSong(String title, float rating) {
@@ -53,15 +55,7 @@ public class Cataloog {
         System.out.println("Song not found");
     }
 
-    public void sortByTitle() {
-        songs.sort(Comparator.comparing(Song::getTitle));
-    }
-
-    public void sortByArtist() {
-        songs.sort(Comparator.comparing(Song::getArtist));
-    }
-
-    public void sortByRating() {
-        songs.sort(Comparator.comparingDouble(Song::getRating).reversed());
+    public void sort(Sorting strategy) {
+        strategy.sort(songs);
     }
 }

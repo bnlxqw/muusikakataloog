@@ -11,9 +11,37 @@ public class Menu {
         this.pm = pm;
     }
 
+    private int getIntChoice(String prompt) {
+        System.out.println(prompt);
+        while (true) {
+            try {
+                return Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Please enter a whole number!");
+            }
+        }
+    }
+
+    private float getFloatValue(String prompt) {
+        System.out.println(prompt);
+        while (true) {
+            try {
+                String input = sc.nextLine().replace(',', '.');
+                return Float.parseFloat(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Please enter a number!");
+            }
+        }
+    }
+
+    private String getStringInput(String prompt) {
+        System.out.println(prompt);
+        return sc.nextLine();
+    }
+
     public void start() {
         while (true) {
-            System.out.println("\n=== MUSIC CATALOG ===");
+            System.out.println("\nMUSIC CATALOG");
             System.out.println("1. Show catalog");
             System.out.println("2. Find song");
             System.out.println("3. Add song");
@@ -23,144 +51,92 @@ public class Menu {
             System.out.println("7. Sort songs");
             System.out.println("0. Exit");
 
-            int choice;
-            try {
-                choice = Integer.parseInt(sc.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Error: enter a number!");
-                continue;
-            }
+            int choice = getIntChoice("Enter your choice:");
 
             switch (choice) {
-
                 case 1:
                     ct.showAllSongs();
                     break;
-
                 case 2:
-                    System.out.println("Enter song title or artist:");
-                    var result = ct.search(sc.nextLine());
+                    var result = ct.search(getStringInput("Enter song title or artist:"));
                     if (result.isEmpty()) {
                         System.out.println("No songs found");
                     } else {
                         result.forEach(System.out::println);
                     }
                     break;
-
                 case 3:
-                    System.out.println("Enter title:");
-                    String title = sc.nextLine();
-
-                    System.out.println("Enter artist:");
-                    String artist = sc.nextLine();
-
-                    System.out.println("Enter rating (1-5):");
-                    float rating = Float.parseFloat(sc.nextLine());
-
-                    System.out.println("Enter duration (minutes):");
-                    float duration = Float.parseFloat(sc.nextLine());
-
+                    String title = getStringInput("Enter title:");
+                    String artist = getStringInput("Enter artist:");
+                    float rating = getFloatValue("Enter rating (1-5):");
+                    float duration = getFloatValue("Enter duration (minutes):");
                     ct.addSong(new Song(title, artist, rating, duration));
                     System.out.println("Song added");
                     break;
-
                 case 4:
-                    System.out.println("Enter song title to delete:");
-                    ct.deleteSong(sc.nextLine());
-                    System.out.println("Song deleted");
+                    ct.deleteSong(getStringInput("Enter song title to delete:"));
                     break;
-
                 case 5:
-                    System.out.println("Enter song title:");
-                    String rateTitle = sc.nextLine();
-
-                    System.out.println("Enter rating (1-5):");
-                    float rate = Float.parseFloat(sc.nextLine());
-
+                    String rateTitle = getStringInput("Enter song title:");
+                    float rate = getFloatValue("Enter rating (1-5):");
                     ct.rateSong(rateTitle, rate);
-                    System.out.println("Rating updated");
                     break;
-
                 case 6:
                     playlistMenu();
                     break;
-
                 case 7:
-                    System.out.println("1 - by title");
-                    System.out.println("2 - by artist");
-                    System.out.println("3 - by rating");
+                    System.out.println("\nSORT OPTIONS");
+                    System.out.println("1. Sort by Title");
+                    System.out.println("2. Sort by Artist");
+                    System.out.println("3. Sort by Rating");
+                    int sortChoice = getIntChoice("Enter (1-3):");
 
-                    int sort = Integer.parseInt(sc.nextLine());
+                    if (sortChoice == 1) ct.sort(new SortByTitle());
+                    else if (sortChoice == 2) ct.sort(new SortByArtist());
+                    else if (sortChoice == 3) ct.sort(new SortByRating());
 
-                    if (sort == 1) ct.sortByTitle();
-                    else if (sort == 2) ct.sortByArtist();
-                    else if (sort == 3) ct.sortByRating();
-
-                    System.out.println("Songs sorted");
                     break;
-
                 case 0:
                     System.out.println("Goodbye!");
                     return;
-
                 default:
                     System.out.println("Invalid choice");
             }
         }
     }
 
-
     private void playlistMenu() {
-        System.out.println("\n=== PLAYLIST MENU ===");
-        System.out.println("1. Create playlist");
-        System.out.println("2. Add song to playlist");
-        System.out.println("3. Remove song from playlist");
-        System.out.println("4. Show playlists");
+        System.out.println("\nPLAYLIST MENU");
+        System.out.println("1. Create");
+        System.out.println("2. Add Song");
+        System.out.println("3. Remove Song");
+        System.out.println("4. Show All");
+        System.out.println("0. Back");
 
-        int choice = Integer.parseInt(sc.nextLine());
+        int choice = getIntChoice("Enter choice:");
 
         switch (choice) {
-
             case 1:
-                System.out.println("Playlist name:");
-                pm.createPlaylist(sc.nextLine());
-                System.out.println("Playlist created");
+                pm.createPlaylist(getStringInput("Name:"));
                 break;
-
             case 2:
-                System.out.println("Playlist name:");
-                Playlist pl = pm.getPlaylist(sc.nextLine());
-                if (pl == null) {
-                    System.out.println("Playlist not found");
-                    return;
-                }
-
-                System.out.println("Song title:");
-                String songTitle = sc.nextLine();
-                ct.search(songTitle).forEach(pl::addSong);
-                System.out.println("Song added to playlist");
+                Playlist pl = pm.getPlaylist(getStringInput("Playlist:"));
+                if (pl != null) ct.search(getStringInput("Song title:")).forEach(pl::addSong);
+                else System.out.println("Playlist not found.");
                 break;
-
             case 3:
-                System.out.println("Playlist name:");
-                Playlist playlist = pm.getPlaylist(sc.nextLine());
-                if (playlist == null) {
-                    System.out.println("Playlist not found");
-                    return;
-                }
-
-                System.out.println("Song title:");
-                playlist.removeSong(sc.nextLine());
-                System.out.println("Song removed");
+                Playlist playlist = pm.getPlaylist(getStringInput("Playlist:"));
+                if (playlist != null) playlist.removeSong(getStringInput("Song title:"));
+                else System.out.println("Playlist not found.");
                 break;
-
             case 4:
-                pm.getPlaylists().forEach((name, playlistShow) -> {
+                pm.getPlaylists().forEach((name, p) -> {
                     System.out.println("\nPlaylist: " + name);
-                    playlistShow.getSongs().forEach(System.out::println);
+                    p.getSongs().forEach(System.out::println);
                 });
                 break;
-
+            case 0:
+                break;
             default:
                 System.out.println("Invalid choice");
         }
