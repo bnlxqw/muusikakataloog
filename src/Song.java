@@ -1,13 +1,14 @@
 public class Song {
-    String title;
-    String artist;
-    float rating;
-    float duration;
+
+    private String title;
+    private String artist;
+    private float rating;
+    private float duration;
 
     public Song(String title, String artist, float rating, float duration) {
         this.title = title;
         this.artist = artist;
-        this.rating = 0;
+        setRating(rating);
         this.duration = duration;
     }
 
@@ -28,14 +29,16 @@ public class Song {
     }
 
     public void setRating(float rating) {
-        if (rating >= 1 && rating <= 5)
+        if (rating >= 1 && rating <= 5) {
             this.rating = rating;
-        else
-            System.out.println("Rating must be 1-5 ");
+        } else {
+            System.out.println("Rating must be between 1 and 5");
+            this.rating = 0;
+        }
     }
 
     @Override
     public String toString() {
-        return title + "|" + artist + "|" + rating + "|" + duration + "min";
+        return title + " | " + artist + " | rating: " + rating + " | " + duration + " min";
     }
 }

@@ -1,13 +1,13 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Cataloog {
+
     private List<Song> songs;
-    private List<Playlist> playlists;
 
     public Cataloog() {
         songs = new ArrayList<>();
-        playlists = new ArrayList<>();
     }
 
     public void addSong(Song song) {
@@ -19,36 +19,49 @@ public class Cataloog {
             System.out.println("Catalog is empty");
             return;
         }
-        System.out.println("All songs: ");
+
+        System.out.println("All songs:");
         for (int i = 0; i < songs.size(); i++) {
-            System.out.println((i + 1) + " " + songs.get(i));
+            System.out.println((i + 1) + ". " + songs.get(i));
         }
     }
 
-    public void findSongByTitle(String title) {
-        boolean found = false;
-        for (Song s : songs){
-            if (s.getTitle().equalsIgnoreCase(title)) {
-                System.out.println("Found: " + s);
-                found = true;
+    public List<Song> search(String keyword) {
+        List<Song> result = new ArrayList<>();
+
+        for (Song s : songs) {
+            if (s.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                    s.getArtist().toLowerCase().contains(keyword.toLowerCase())) {
+                result.add(s);
             }
         }
-
-        if (!found){
-            System.out.println("Song with title " + title + "is not found");
-        }
+        return result;
     }
 
-    public void deleteSong(Song song) {
-        songs.remove(song);
+    public void deleteSong(String title) {
+        songs.removeIf(song ->
+                song.getTitle().equalsIgnoreCase(title));
     }
 
     public void rateSong(String title, float rating) {
-        for (Song s : songs) {
-            if (s.getTitle().equalsIgnoreCase(title)) {
-                s.setRating(rating);
+        for (Song song : songs) {
+            if (song.getTitle().equalsIgnoreCase(title)) {
+                song.setRating(rating);
                 return;
             }
         }
+        System.out.println("Song not found");
+    }
+
+    public void sortByTitle() {
+        songs.sort(Comparator.comparing(Song::getTitle));
+    }
+
+    public void sortByArtist() {
+        songs.sort(Comparator.comparing(Song::getArtist));
+    }
+
+    public void sortByRating() {
+        songs.sort(Comparator.comparingDouble(Song::getRating).reversed());
     }
 }
